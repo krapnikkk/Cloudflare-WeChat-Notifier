@@ -1,0 +1,22 @@
+name = "ilink-cloudflare"
+main = "src/index.ts"
+compatibility_date = "2026-03-26"
+
+[vars]
+ILINK_BASE_URL = "https://ilinkai.weixin.qq.com"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "ilink-cloudflare"
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "migrations"
+
+[[queues.producers]]
+binding = "NOTIFICATION_QUEUE"
+queue = "ilink-notification-queue"
+
+[[queues.consumers]]
+queue = "ilink-notification-queue"
+max_batch_size = 10
+max_batch_timeout = 5
+max_retries = 3

@@ -1,0 +1,5 @@
+ADMIN_TOKEN=replace-with-admin-token
+WEBHOOK_SHARED_TOKEN=replace-with-webhook-token
+BOT_STATE_ENC_KEY=replace-with-long-random-secret
+ILINK_BASE_URL=https://ilinkai.weixin.qq.com
+
