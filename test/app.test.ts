@@ -79,6 +79,9 @@ const createServices = (): AppServices => ({
     }),
     processQueuedDelivery: vi.fn().mockResolvedValue({
       outcome: "ack"
+    }),
+    handleQueueProcessingError: vi.fn().mockResolvedValue({
+      outcome: "ack"
     })
   },
   health: {

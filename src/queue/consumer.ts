@@ -8,13 +8,28 @@ export const handleQueueBatch = async (batch: MessageBatch<QueueDeliveryMessage>
       continue;
     }
 
-    const result = await context.services.delivery.processQueuedDelivery(deliveryId, message.attempts);
-    if (result.outcome === "retry") {
-      message.retry(result.delaySeconds ? { delaySeconds: result.delaySeconds } : undefined);
-      continue;
-    }
+    try {
+      const result = await context.services.delivery.processQueuedDelivery(deliveryId, message.attempts);
+      if (result.outcome === "retry") {
+        message.retry(result.delaySeconds ? { delaySeconds: result.delaySeconds } : undefined);
+        continue;
+      }
 
-    message.ack();
+      message.ack();
+    } catch (error) {
+      console.error("[queue] delivery processing failed", {
+        deliveryId,
+        attempts: message.attempts,
+        error
+      });
+
+      const result = await context.services.delivery.handleQueueProcessingError(deliveryId, message.attempts, error);
+      if (result.outcome === "retry") {
+        message.retry(result.delaySeconds ? { delaySeconds: result.delaySeconds } : undefined);
+        continue;
+      }
+
+      message.ack();
+    }
   }
 };
-

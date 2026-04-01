@@ -123,6 +123,7 @@ export interface DeliveryService {
   listDeliveries(query: DeliveryListQuery): Promise<DeliveryListResult>;
   getDelivery(deliveryId: string): Promise<DeliveryLog | null>;
   processQueuedDelivery(deliveryId: string, attempts: number): Promise<QueueProcessResult>;
+  handleQueueProcessingError(deliveryId: string, attempts: number, error: unknown): Promise<QueueProcessResult>;
 }
 
 export interface HealthService {

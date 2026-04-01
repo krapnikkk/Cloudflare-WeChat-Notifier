@@ -140,4 +140,39 @@ export class DefaultDeliveryService {
       };
     }
   }
+
+  public async handleQueueProcessingError(deliveryId: string, attempts: number, error: unknown): Promise<QueueProcessResult> {
+    const message = `队列处理异常: ${toErrorMessage(error)}`;
+
+    try {
+      const delivery = await this.deliveryLogRepository.getById(deliveryId);
+      if (!delivery) {
+        return {
+          outcome: "ack"
+        };
+      }
+
+      if (attempts <= RETRYABLE_ATTEMPTS) {
+        await this.deliveryLogRepository.markRetrying(deliveryId, attempts, message, null);
+        return {
+          outcome: "retry",
+          delaySeconds: Math.max(attempts, 1) * 5
+        };
+      }
+
+      await this.deliveryLogRepository.markFailed(deliveryId, attempts, message, null);
+      return {
+        outcome: "ack"
+      };
+    } catch {
+      return attempts <= RETRYABLE_ATTEMPTS
+        ? {
+            outcome: "retry",
+            delaySeconds: Math.max(attempts, 1) * 5
+          }
+        : {
+            outcome: "ack"
+          };
+    }
+  }
 }
